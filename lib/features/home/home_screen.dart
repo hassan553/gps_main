@@ -129,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                   }
 
                   final notifications = snapshot.data!.docs;
-                  final displayCount = min(3, notifications.length);
+                  final displayCount = min(4, notifications.length);
 
                   return Column(
                     children: List.generate(displayCount, (index) {

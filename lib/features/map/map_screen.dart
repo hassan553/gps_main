@@ -35,6 +35,7 @@ class _MappageWidgetState extends State<MappageWidget> {
                 bottom: 10,
                 left: 10,
                 child: FloatingActionButton(
+                  heroTag: 'fab_stream',
                   backgroundColor: Color(0xFF557959),
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
@@ -47,10 +48,12 @@ class _MappageWidgetState extends State<MappageWidget> {
                       for (var e in data) {
                         v += '${e?.title ?? ''},';
                       }
-                      mapKey.currentState?.goToCurrentUserLocation(
-                        data.isEmpty ? '' : v,
-                        data,
-                      );
+                      if (mapKey.currentState != null) {
+                        print('Calling goToCurrentUserLocation with: $v');
+                        mapKey.currentState?.goToCurrentUserLocation(v, data);
+                      } else {
+                        print('mapKey.currentState is null!');
+                      }
                     }
                   },
                   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
@@ -60,6 +63,7 @@ class _MappageWidgetState extends State<MappageWidget> {
                 bottom: 10,
                 right: 10,
                 child: FloatingActionButton(
+                  heroTag: 'fab_camera',
                   backgroundColor: Color(0xFF557959),
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
@@ -74,10 +78,12 @@ class _MappageWidgetState extends State<MappageWidget> {
                       for (var e in data) {
                         v += '${e?.title ?? ''},';
                       }
-                      mapKey.currentState?.goToCurrentUserLocation(
-                        data.isEmpty ? '' : v,
-                        data,
-                      );
+                      if (mapKey.currentState != null) {
+                        print('Calling goToCurrentUserLocation with: $v');
+                        mapKey.currentState?.goToCurrentUserLocation(v, data);
+                      } else {
+                        print('mapKey.currentState is null!');
+                      }
                     }
                   },
                   child: Icon(Icons.stream, color: Colors.white),
@@ -91,9 +97,9 @@ class _MappageWidgetState extends State<MappageWidget> {
   }
 }
 
-//
 class MapSample extends StatefulWidget {
-  const MapSample({super.key});
+  final Key? key;
+  const MapSample({this.key});
 
   @override
   State<MapSample> createState() => MapSampleState();
@@ -101,70 +107,115 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   GoogleMapController? _controller;
+  bool _isMapReady = false;
+  bool _isLoadingLocation = false;
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(24.895105290714362, 46.34089267395434),
     zoom: 18.4746,
   );
 
-  static const CameraPosition _kLake = CameraPosition(
-    bearing: 192.8334901395799,
-    target: LatLng(24.895105290714362, 46.34089267395434),
-    tilt: 59.440717697143555,
-    zoom: 18.151926040649414,
-  );
   Marker? _userMarker;
-
-  // @override
-  // void didPopNext() {
-  //   _goToCurrentUserLocation();
-  // }
-  //
-  // Future<void> _goToCurrentUserLocation() async {
-  //   final position = await Geolocator.getCurrentPosition();
-  //   final latLng = LatLng(position.latitude, position.longitude);
-  //
-  //   _controller
-  //       ?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 18.151926040649414));
-  //
-  //   setState(() {
-  //     _userMarker = Marker(
-  //       markerId: MarkerId("user"),
-  //       position: latLng,
-  //       infoWindow: InfoWindow(title: "Your Location"),
-  //     );
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      mapType: MapType.hybrid,
-      initialCameraPosition: _kGooglePlex,
-      markers: _userMarker != null ? {_userMarker!} : {},
-      myLocationEnabled: true,
-      onMapCreated: (GoogleMapController controller) {
-        _controller = controller;
-      },
+    return Stack(
+      children: [
+        GoogleMap(
+          mapType: MapType.hybrid,
+          initialCameraPosition: _kGooglePlex,
+          markers: _userMarker != null ? {_userMarker!} : {},
+          myLocationEnabled: true,
+          onMapCreated: (GoogleMapController controller) {
+            _controller = controller;
+            setState(() {
+              _isMapReady = true;
+            });
+          },
+        ),
+         if (_isLoadingLocation)
+          Container(
+            color: Colors.black.withOpacity(0.4),
+            child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          ),
+        if (!_isMapReady)
+          Container(
+           child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   void goToCurrentUserLocation(String result, List<PatienModel?> data) async {
-    final position = await Geolocator.getCurrentPosition();
-    final latLng = LatLng(position.latitude, position.longitude);
-
-    _controller?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 18.15));
-
     setState(() {
-      _userMarker = Marker(
-        markerId: MarkerId("user"),
-        position: latLng,
-        infoWindow: InfoWindow(title: 'Tomato'),
-        onTap: () {
-          showCustomDialog(context, data);
-        },
-      );
+      _isLoadingLocation = true;
     });
+
+    print('goToCurrentUserLocation started...');
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
+      setState(() => _isLoadingLocation = false);
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied.');
+      setState(() => _isLoadingLocation = false);
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      final latLng = LatLng(position.latitude, position.longitude);
+
+      print('Got user position: $latLng');
+      if (_controller == null) {
+        print('Map controller is null');
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      await _controller!.animateCamera(
+        CameraUpdate.newLatLngZoom(latLng, 18.15),
+      );
+
+      print('Camera animated to new position');
+
+      setState(() {
+        _userMarker = Marker(
+          markerId: MarkerId("user"),
+          position: latLng,
+          infoWindow: InfoWindow(title: 'Tomato'),
+          onTap: () {
+            showCustomDialog(context, data);
+          },
+        );
+        _isLoadingLocation = false;
+      });
+    } catch (e) {
+      print('Error in goToCurrentUserLocation: $e');
+      setState(() => _isLoadingLocation = false);
+    }
   }
 
   void showCustomDialog(BuildContext context, List<PatienModel?> data) {

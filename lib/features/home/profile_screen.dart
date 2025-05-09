@@ -85,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'name': nameController.text.trim(),
         'imageUrl': uploadedImageUrl ?? imageUrl,
         // 'email': emailController.text.trim(),
-        'password': passwordController.text.trim(),
+        //'password': passwordController.text.trim(),
       }, SetOptions(merge: true));
 
       setState(() {
@@ -201,6 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextField(
             controller: passwordController,
             obscureText: _obscurePassword,
+            readOnly: true,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               labelText: "Password",
@@ -269,4 +270,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  
 }

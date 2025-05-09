@@ -216,37 +216,37 @@ class PatienModel {
 
 List<PatienModel> patientList = [
   PatienModel(
-    title: "Bacterial Spot",
+    title: "Disease : Bacterial Spot",
     subtitle:
-        "Causes dark, water-soaked spots on leaves and fruits; thrives in humid conditions.",
+        "AI Solution : Causes dark, water-soaked spots on leaves and fruits; thrives in humid conditions.",
   ),
   PatienModel(
-    title: "Early_Blight",
+    title: "Disease : Early_Blight",
     subtitle:
-        "Fungal disease with dark ringed spots; weakens tomatoes and potatoes.",
+        "AI Solution : Fungal disease with dark ringed spots; weakens tomatoes and potatoes.",
   ),
   PatienModel(
     title: "Healthy",
-    subtitle: "Plant shows no disease; vibrant leaves and strong growth.",
+    subtitle: "AI Description : Plant shows no disease; vibrant leaves and strong growth.",
   ),
   PatienModel(
-    title: "Late_blight",
-    subtitle: "Rapidly spreading disease causing dark lesions and crop decay.",
+    title: "Disease : Late_blight",
+    subtitle: "AI Solution : Rapidly spreading disease causing dark lesions and crop decay.",
   ),
   PatienModel(
-    title: "Leaf Mold",
+    title: "Disease : Leaf Mold",
     subtitle:
-        "Yellow spots and mold on leaves; affects tomatoes in humid areas.",
+        "AI Solution : Yellow spots and mold on leaves; affects tomatoes in humid areas.",
   ),
   PatienModel(
-    title: "Target_Spot",
+    title: "Disease : Target_Spot",
     subtitle:
-        "Brown, ringed leaf lesions; reduces yield in warm, moist climates.",
+        "AI Solution : Brown, ringed leaf lesions; reduces yield in warm, moist climates.",
   ),
   PatienModel(
-    title: "Black spot",
+    title: "Disease : Black spot",
     subtitle:
-        "Black leaf spots with yellowing; common in roses under humidity.",
+        "AI Solution : Black leaf spots with yellowing; common in roses under humidity.",
   ),
 ];
 
