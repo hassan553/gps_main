@@ -16,7 +16,7 @@ class CameraStreamScreen extends StatefulWidget {
 }
 
 class _CameraStreamScreenState extends State<CameraStreamScreen> {
-  late CameraController _controller;
+  CameraController? _controller;
   late List<CameraDescription> cameras;
   bool _isStreaming = false;
   Timer? _timer;
@@ -37,7 +37,7 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
   Future<void> initializeCamera() async {
     cameras = await availableCameras();
     _controller = CameraController(cameras[0], ResolutionPreset.medium);
-    await _controller.initialize();
+    await _controller?.initialize();
     setState(() {});
     startStreaming();
   }
@@ -45,12 +45,12 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
   void startStreaming() {
     _isStreaming = true;
     _timer = Timer.periodic(const Duration(seconds: 3), (_) async {
-      if (!_controller.value.isInitialized || !_isStreaming) return;
+      if (!_controller!.value.isInitialized || !_isStreaming) return;
 
-      final image = await _controller.takePicture();
+      final image = await _controller?.takePicture();
       setState(() => _loading = true);
 
-      final results = await sendImageAsBase64(File(image.path));
+      final results = await sendImageAsBase64(File(image!.path));
 
       setState(() {
         resultValues = results;
@@ -87,8 +87,7 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
           }
         }
         setState(() {});
-        print('////////////////////');
-        print(results);
+
         return results;
       } else {
         print("❌ Error ${response.statusCode}:\n${response.body}");
@@ -102,89 +101,90 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
+    _controller?.dispose();
     _isStreaming = false;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF557959),
         title: const Text("Live Camera Stream"),
       ),
-      body: Stack(
-        children: [
-          CameraPreview(_controller),
-          if (_loading)
-            Positioned(
-              top: 100,
-              left: MediaQuery.of(context).size.width / 2 - 20,
-              child: CircularProgressIndicator(color: kPrimaryColor),
-            ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-                  resultValues
-                      .map(
-                        (e) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Text(
-                            e,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              backgroundColor: Colors.black54,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child:
-                dateValues.isEmpty
-                    ? SizedBox.shrink()
-                    : ElevatedButton.icon(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                          Color(0xFF557959),
-                        ),
-                      ),
-                      onPressed: () {
-                        List<PatienModel?> data = [];
-                        for (int i = 0; i < dateValues.length; i++) {
-                          final r = findPatientByKeyword(
-                            dateValues.toList()[i],
-                          );
-                          if (r != null) {
-                            data.add(r);
-                          }
-                        }
-                        Navigator.pop(context, data);
-                      },
-                      icon: Icon(Icons.map, color: Colors.white),
-                      label: Text(
-                        "Show on map",
-                        style: TextStyle(color: Colors.white),
-                      ),
+      body:
+          _controller == null
+              ? SizedBox.shrink()
+              : Stack(
+                children: [
+                  CameraPreview(_controller!),
+                  if (_loading)
+                    Positioned(
+                      top: 100,
+                      left: MediaQuery.of(context).size.width / 2 - 20,
+                      child: CircularProgressIndicator(color: kPrimaryColor),
                     ),
-          ),
-        ],
-      ),
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                          resultValues
+                              .map(
+                                (e) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0,
+                                  ),
+                                  child: Text(
+                                    e,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      backgroundColor: Colors.black54,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: MediaQuery.of(context).size.width / 2 - 70,
+                    child:
+                        dateValues.isEmpty
+                            ? SizedBox.shrink()
+                            : ElevatedButton.icon(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(
+                                  Color(0xFF557959),
+                                ),
+                              ),
+                              onPressed: () {
+                                List<PatienModel?> data = [];
+                                for (int i = 0; i < dateValues.length; i++) {
+                                  final r = findPatientByKeyword(
+                                    dateValues.toList()[i],
+                                  );
+                                  if (r != null) {
+                                    data.add(r);
+                                  }
+                                }
+                                Navigator.pop(context, data);
+                              },
+                              icon: Icon(Icons.map, color: Colors.white),
+                              label: Text(
+                                "Show on map",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                  ),
+                ],
+              ),
     );
   }
 }
