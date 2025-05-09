@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1074900544359",
+    "project_id": "farmerseye-ykuq5i",
+    "storage_bucket": "farmerseye-ykuq5i.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074900544359:android:b0c62ba8d93b8511399dc2",
+        "android_client_info": {
+          "package_name": "com.example.gps_main"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQMLtst2CwtRgjY0j9PEZs4YQ4ybYpmnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074900544359:android:63d3f6b1fd882171399dc2",
+        "android_client_info": {
+          "package_name": "com.mycompany.farmerseye"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQMLtst2CwtRgjY0j9PEZs4YQ4ybYpmnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
