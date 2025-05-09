@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gps_main/core/constants.dart';
 import 'package:gps_main/features/home/home_screen.dart';
@@ -31,20 +32,44 @@ class NotificationScreen extends StatelessWidget {
         centerTitle: true,
         elevation: 2.0,
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: NotificationCard(
-              icon: Icons.warning_amber,
-              title: "New Message",
-              subtitle: "New message",
-              time: "2m ago",
-              color: Colors.purple.shade100,
-            ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream:
+            FirebaseFirestore.instance
+                .collection('notifications')
+                .orderBy('time', descending: true)
+                .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No notifications found."));
+          }
+
+          final notifications = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              final data = notifications[index].data() as Map<String, dynamic>;
+              final title = data['title'] ?? '';
+              final desc = data['description'] ?? '';
+              final time = data['time'] as Timestamp?;
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: NotificationCard(
+                  icon: Icons.warning_amber,
+                  title: title,
+                  subtitle: desc,
+                  time: formatTime(time),
+                  color: Colors.purple.shade100,
+                ),
+              );
+            },
           );
         },
-        itemCount: 23,
       ),
     );
   }

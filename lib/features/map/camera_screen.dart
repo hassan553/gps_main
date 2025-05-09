@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gps_main/core/constants.dart';
 import 'package:gps_main/features/map/live_camera_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -201,25 +203,6 @@ class _AiCameraScreenState extends State<AiCameraScreen> {
         _loading = false;
       });
       return e.toString();
-    }
-  }
-
-  Future<void> storeDataToFirestore({
-    required String title,
-    required String description,
-    required DateTime time,
-  }) async {
-    try {
-      await FirebaseFirestore.instance.collection('notifications').add({
-        'title': title,
-        'description': description,
-        'time': Timestamp.fromDate(
-          time,
-        ), // Converts DateTime to Firestore Timestamp
-      });
-      print("Data added successfully!");
-    } catch (e) {
-      print("Error storing data: $e");
     }
   }
 }

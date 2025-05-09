@@ -84,6 +84,11 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
           for (var item in predictions) {
             results.add(item['class']);
             dateValues.add(item['class']);
+            await storeDataToFirestore(
+              title: item['class'],
+              description: findPatientByKeyword(item['class'])?.subtitle ?? "",
+              time: DateTime.now(),
+            );
           }
         }
         setState(() {});

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gps_main/features/home/main_screen.dart';
 
@@ -26,11 +25,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: const Color(0xFFE4EDE5),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              const Icon(Icons.star, size: 60, color: Color(0xFF4A6849)),
-              const SizedBox(height: 24),
+              SizedBox(height: 30),
+              Transform.scale(
+                scale: 2,
+                child: Image.asset(
+                  'assets/icon.png',
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(

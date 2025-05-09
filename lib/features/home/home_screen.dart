@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gps_main/core/constants.dart';
 
@@ -110,18 +113,45 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              ...List.generate(23, (index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: NotificationCard(
-                    icon: Icons.warning_amber,
-                    title: "New Message",
-                    subtitle: "New message",
-                    time: "2m ago",
-                    color: Colors.purple.shade100,
-                  ),
-                );
-              }),
+              StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance
+                        .collection('notifications')
+                        .orderBy('time', descending: true)
+                        .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text("No notifications found."));
+                  }
+
+                  final notifications = snapshot.data!.docs;
+                  final displayCount = min(3, notifications.length);
+
+                  return Column(
+                    children: List.generate(displayCount, (index) {
+                      final data =
+                          notifications[index].data() as Map<String, dynamic>;
+                      final title = data['title'] ?? '';
+                      final desc = data['description'] ?? '';
+                      final time = data['time'] as Timestamp?;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: NotificationCard(
+                          icon: Icons.warning_amber,
+                          title: title,
+                          subtitle: desc,
+                          time: formatTime(time),
+                          color: Colors.purple.shade100,
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
             ],
           ),
         ],
@@ -194,7 +224,7 @@ class NotificationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'New Message',
+                      title,
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontFamily: 'Inter Tight',
                         letterSpacing: 0.0,
@@ -203,7 +233,7 @@ class NotificationCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'New message',
+                      subtitle,
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontFamily: 'Inter',
                         fontSize: 14,
@@ -215,7 +245,7 @@ class NotificationCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '2m ago',
+                time,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   fontFamily: 'Inter',
                   color: Colors.grey,

@@ -23,15 +23,19 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color(0xFFE4EDE5),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              Image.asset(
-                'assets/icon.png',
-                height: 100,
-                width: 100,
-                fit: BoxFit.fill,
+              Transform.scale(
+                scale: 2,
+                child: Image.asset(
+                  'assets/icon.png',
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.fill,
+                ),
               ),
+              SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -174,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     );
 
-                                     Navigator.pushReplacement(
+                                    Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => MainScreen(),
