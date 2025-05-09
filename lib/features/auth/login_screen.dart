@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gps_main/core/constants.dart';
 import 'package:gps_main/features/auth/register_screen.dart';
+import 'package:gps_main/features/home/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -81,10 +82,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextFormField(
                         controller: passwordController,
                         obscureText: obscurePassword,
-                         validator: (value) {
+                        validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
-                          }else if (value.length < 8) {
+                          } else if (value.length < 8) {
                             return 'Password must be at least 8 characters';
                           }
                           return null;
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
-                         
+
                           suffixIcon: IconButton(
                             icon: Icon(
                               obscurePassword
@@ -173,8 +174,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     );
 
-                                    // Navigate to home screen or dashboard
-                                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+                                     Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MainScreen(),
+                                      ),
+                                    );
                                   } on FirebaseAuthException catch (e) {
                                     String message = 'Login failed';
                                     if (e.code == 'user-not-found') {

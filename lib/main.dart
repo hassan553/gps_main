@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gps_main/features/auth/login_screen.dart';
+import 'package:gps_main/features/home/main_screen.dart';
 import 'package:gps_main/firebase_options.dart';
 
 void main() async {
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GPS Main',
       theme: ThemeData(),
-      home:FirebaseAuth.instance.currentUser==null?LoginScreen(): const LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home:FirebaseAuth.instance.currentUser==null?LoginScreen(): const MainScreen(),
     );
   }
 }

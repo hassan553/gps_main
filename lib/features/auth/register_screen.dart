@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gps_main/features/home/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -247,8 +248,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                     );
 
-                                    // Navigate to home or login screen
-                                    Navigator.pop(context);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MainScreen(),
+                                      ),
+                                    );
                                   } on FirebaseAuthException catch (e) {
                                     String message = 'An error occurred';
                                     if (e.code == 'email-already-in-use') {
