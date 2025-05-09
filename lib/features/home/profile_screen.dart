@@ -81,15 +81,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         uploadedImageUrl = await ref.getDownloadURL();
       }
 
-      // Update email if changed
-      if (emailController.text.trim() != user.email) {
-        await user.updateEmail(emailController.text.trim());
-      }
-
-      // Update Firestore
       await _firestore.collection("users").doc(user.uid).set({
         'name': nameController.text.trim(),
         'imageUrl': uploadedImageUrl ?? imageUrl,
+        // 'email': emailController.text.trim(),
+        'password': passwordController.text.trim(),
       }, SetOptions(merge: true));
 
       setState(() {
@@ -150,7 +146,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ClipOval(
                   child:
-                      _imageFile != null
+                      imageUrl != null
+                          ? Image.network(
+                            imageUrl!,
+                            height: 120,
+                            width: 120,
+                            fit: BoxFit.cover,
+                          )
+                          : _imageFile != null
                           ? Image.memory(
                             _imageFile!.readAsBytesSync(),
                             height: 120,
@@ -191,6 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 30),
           TextField(
             controller: emailController,
+            readOnly: true,
             decoration: InputDecoration(labelText: "Email"),
           ),
           const SizedBox(height: 30),

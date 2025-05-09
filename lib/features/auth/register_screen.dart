@@ -240,6 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           'uid': credential.user!.uid,
                                           'name': name,
                                           'email': email,
+                                          'password': password,
                                           'created_at':
                                               FieldValue.serverTimestamp(),
                                         });
