@@ -32,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
+  String password = '';
   Future<void> _loadUserData() async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -43,6 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           emailController.text = user.email ?? '';
           imageUrl = doc.data()?['imageUrl'];
           passwordController.text = doc.data()?['password'] ?? '';
+          password = doc.data()?['password'] ?? '';
         });
       }
     }
@@ -65,11 +67,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Reauthenticate user
       final cred = EmailAuthProvider.credential(
         email: user.email!,
-        password: passwordController.text.trim(),
+        password: password,
       );
 
       await user.reauthenticateWithCredential(cred);
-
+      if (passwordController.text.trim().isNotEmpty) {
+        await user.updatePassword(passwordController.text.trim());
+      }
       String? uploadedImageUrl;
 
       // Upload image if changed
@@ -84,8 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _firestore.collection("users").doc(user.uid).set({
         'name': nameController.text.trim(),
         'imageUrl': uploadedImageUrl ?? imageUrl,
-        // 'email': emailController.text.trim(),
-        //'password': passwordController.text.trim(),
+        'email': emailController.text.trim(),
+        'password': passwordController.text.trim(),
       }, SetOptions(merge: true));
 
       setState(() {
@@ -146,16 +150,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ClipOval(
                   child:
-                      imageUrl != null
-                          ? Image.network(
-                            imageUrl!,
+                      _imageFile != null
+                          ? Image.file(
+                            File(_imageFile!.path),
                             height: 120,
                             width: 120,
                             fit: BoxFit.cover,
                           )
-                          : _imageFile != null
-                          ? Image.memory(
-                            _imageFile!.readAsBytesSync(),
+                          : imageUrl != null
+                          ? Image.network(
+                            imageUrl!,
                             height: 120,
                             width: 120,
                             fit: BoxFit.cover,
@@ -201,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextField(
             controller: passwordController,
             obscureText: _obscurePassword,
-            readOnly: true,
+
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               labelText: "Password",
@@ -270,6 +274,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
-  
 }

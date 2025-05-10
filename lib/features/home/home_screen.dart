@@ -104,7 +104,7 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 16.0),
                 child: Text(
-                  'Notifications',
+                  'Updates',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     fontFamily: 'Inter Tight',
                     letterSpacing: 0.0,
