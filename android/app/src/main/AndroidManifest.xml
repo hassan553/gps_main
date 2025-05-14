@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
-        android:label="gps_main"
+        android:label="Farmer's eye"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

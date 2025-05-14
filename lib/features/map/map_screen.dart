@@ -71,7 +71,6 @@ class _MappageWidgetState extends State<MappageWidget> {
                         builder: (context) => CameraStreamScreen(),
                       ),
                     );
-
                     if (result != null) {
                       final data = result as List<PatienModel?>;
                       String v = '';
@@ -133,7 +132,7 @@ class MapSampleState extends State<MapSample> {
             });
           },
         ),
-         if (_isLoadingLocation)
+        if (_isLoadingLocation)
           Container(
             color: Colors.black.withOpacity(0.4),
             child: const Center(
@@ -144,7 +143,7 @@ class MapSampleState extends State<MapSample> {
           ),
         if (!_isMapReady)
           Container(
-           child: const Center(
+            child: const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
@@ -206,6 +205,7 @@ class MapSampleState extends State<MapSample> {
           markerId: MarkerId("user"),
           position: latLng,
           infoWindow: InfoWindow(title: 'Tomato'),
+          icon: data.first?.markerIcon ?? BitmapDescriptor.defaultMarker,
           onTap: () {
             showCustomDialog(context, data);
           },
@@ -258,6 +258,7 @@ class MapSampleState extends State<MapSample> {
                                   child: CustomExpansionTile(
                                     title: data[index]?.title ?? "",
                                     children: data[index]!.subtitle.split('\n'),
+                                    children2: data[index]!.subtitle2.split('\n'),
                                   ),
                                 ),
                               ],
@@ -280,11 +281,13 @@ class MapSampleState extends State<MapSample> {
 class CustomExpansionTile extends StatelessWidget {
   final String title;
   final List<String> children;
+  final List<String> children2;
 
   const CustomExpansionTile({
     super.key,
     required this.title,
     required this.children,
+    required this.children2,
   });
 
   @override
@@ -308,25 +311,47 @@ class CustomExpansionTile extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           children:
-              children
-                  .map(
-                    (child) => Container(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: 8,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        child,
-                        style: const TextStyle(
-                          color: Color(0xFF557959),
-                          fontSize: 14,
-                        ),
+              [
+                ...children
+                .map(
+                  (child) => Container(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 8,
+                    ),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      child,
+                      style: const TextStyle(
+                        color: Color(0xFF557959),
+                        fontSize: 14,
                       ),
                     ),
-                  )
-                  .toList(),
+                  ),
+                )
+                .toList(),
+                SizedBox(height: 4),
+                ...children2
+                .map(
+                  (child) => Container(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 8,
+                    ),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      child,
+                      style: const TextStyle(
+                        color: Color(0xFF557959),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                )
+                .toList()
+              ],
         ),
       ),
     );

@@ -82,13 +82,36 @@ class _CameraStreamScreenState extends State<CameraStreamScreen> {
 
         if (predictions is List && predictions.isNotEmpty) {
           for (var item in predictions) {
-            results.add(item['class']);
+            num confidence = item['confidence'];
+           if (confidence > 0.6) {
+              results.add(item['class']);
             dateValues.add(item['class']);
             await storeDataToFirestore(
               title: item['class'],
               description: findPatientByKeyword(item['class'])?.subtitle ?? "",
               time: DateTime.now(),
             );
+            } else if (confidence > 0.3 && confidence < 0.6) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Please enter a clear image',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'This is not a plant',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         }
         setState(() {});

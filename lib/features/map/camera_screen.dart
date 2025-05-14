@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gps_main/core/constants.dart';
 import 'package:gps_main/features/map/live_camera_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -177,13 +178,36 @@ class _AiCameraScreenState extends State<AiCameraScreen> {
         if (predictions is List && predictions.isNotEmpty) {
           for (int i = 0; i < predictions.length; i++) {
             final className = predictions[i]['class'];
+            num confidence = predictions[i]['confidence'];
             print('Class: $className');
-            resultValues.add(className);
-            await storeDataToFirestore(
-              title: className,
-              description: findPatientByKeyword(className)?.subtitle??"",
-              time: DateTime.now(),
-            );
+            if (confidence > 0.6) {
+              resultValues.add(className);
+              await storeDataToFirestore(
+                title: className,
+                description: findPatientByKeyword(className)?.subtitle ?? "",
+                time: DateTime.now(),
+              );
+            } else if (confidence > 0.3 && confidence < 0.6) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Please enter a clear image',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'This is not a plant',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         } else {
           print('No predictions found.');
@@ -210,43 +234,82 @@ class _AiCameraScreenState extends State<AiCameraScreen> {
 class PatienModel {
   String title;
   String subtitle;
+  String subtitle2;
+  BitmapDescriptor? markerIcon;
 
-  PatienModel({required this.title, required this.subtitle});
+  PatienModel({
+    required this.subtitle2,
+    required this.title,
+    required this.subtitle,
+    required this.markerIcon,
+  });
 }
 
 List<PatienModel> patientList = [
   PatienModel(
     title: "Disease : Bacterial Spot",
     subtitle:
-        "AI Solution : Causes dark, water-soaked spots on leaves and fruits; thrives in humid conditions.",
+        "AI Description : Causes dark, water-soaked spots on leaves and fruits; thrives in humid conditions.",
+    subtitle2:
+        "AI Solution : Prune and remove affected leaves. Apply copper-based bactericides to control the spread. Avoid overhead watering to reduce humidity around the plant.",
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
   ),
   PatienModel(
     title: "Disease : Early_Blight",
     subtitle:
-        "AI Solution : Fungal disease with dark ringed spots; weakens tomatoes and potatoes.",
+        "AI Description : Fungal disease with dark ringed spots; weakens tomatoes and potatoes.",
+    subtitle2:
+        "AI Solution : Remove and destroy infected plant parts. Apply fungicides like chlorothalonil or mancozeb to prevent further spread. Crop rotation and selecting resistant varieties help reduce recurrence. ",
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
   ),
   PatienModel(
     title: "Healthy",
-    subtitle: "AI Description : Plant shows no disease; vibrant leaves and strong growth.",
+    subtitle:
+        "AI Description : Plant shows no disease; vibrant leaves and strong growth.",
+    subtitle2: '',
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueGreen,
+    ),
   ),
   PatienModel(
     title: "Disease : Late_blight",
-    subtitle: "AI Solution : Rapidly spreading disease causing dark lesions and crop decay.",
+    subtitle:
+        "AI Description : Rapidly spreading disease causing dark lesions and crop decay.",
+    subtitle2:
+        "AI Solution : Remove and dispose of infected plants. Apply fungicides such as copper-based sprays. Ensure proper spacing for air circulation and avoid overhead irrigation to minimize humidity.",
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueOrange,
+    ),
   ),
   PatienModel(
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueAzure,
+    ),
     title: "Disease : Leaf Mold",
     subtitle:
-        "AI Solution : Yellow spots and mold on leaves; affects tomatoes in humid areas.",
+        "AI Description : Yellow spots and mold on leaves; affects tomatoes in humid areas.",
+    subtitle2:
+        "AI Solution :  Remove infected leaves and ensure proper spacing between plants for air circulation. Use fungicides like sulfur or copper products, and avoid overhead watering.",
   ),
   PatienModel(
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueViolet,
+    ),
     title: "Disease : Target_Spot",
     subtitle:
-        "AI Solution : Brown, ringed leaf lesions; reduces yield in warm, moist climates.",
+        "AI Description : Brown, ringed leaf lesions; reduces yield in warm, moist climates.",
+    subtitle2:
+        "AI Solution : Remove and dispose of infected leaves. Apply fungicides such as tebuconazole or azoxystrobin. Implement good field sanitation and avoid working with wet plants.",
   ),
   PatienModel(
+    markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+      BitmapDescriptor.hueMagenta,
+    ),
     title: "Disease : Black spot",
     subtitle:
-        "AI Solution : Black leaf spots with yellowing; common in roses under humidity.",
+        "AI Description : Black leaf spots with yellowing; common in roses under humidity.",
+    subtitle2:
+        "AI Solution : Prune and remove infected leaves. Apply fungicides like neem oil or sulfur to control the spread. Ensure good air circulation and water at the base of the plant to prevent fungal spores from splashing onto leaves.",
   ),
 ];
 
