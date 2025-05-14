@@ -258,7 +258,9 @@ class MapSampleState extends State<MapSample> {
                                   child: CustomExpansionTile(
                                     title: data[index]?.title ?? "",
                                     children: data[index]!.subtitle.split('\n'),
-                                    children2: data[index]!.subtitle2.split('\n'),
+                                    children2: data[index]!.subtitle2.split(
+                                      '\n',
+                                    ),
                                   ),
                                 ),
                               ],
@@ -310,9 +312,8 @@ class CustomExpansionTile extends StatelessWidget {
             title,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
-          children:
-              [
-                ...children
+          children: [
+            ...children
                 .map(
                   (child) => Container(
                     padding: const EdgeInsets.only(
@@ -331,8 +332,8 @@ class CustomExpansionTile extends StatelessWidget {
                   ),
                 )
                 .toList(),
-                SizedBox(height: 4),
-                ...children2
+            SizedBox(height: 4),
+            ...children2
                 .map(
                   (child) => Container(
                     padding: const EdgeInsets.only(
@@ -350,8 +351,8 @@ class CustomExpansionTile extends StatelessWidget {
                     ),
                   ),
                 )
-                .toList()
-              ],
+                .toList(),
+          ],
         ),
       ),
     );
